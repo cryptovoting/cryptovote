@@ -5,7 +5,7 @@ from json import loads
 from ..helpers import election_exists, send_vote_email
 from ..models import Voter, Election, Authority, Candidate
 from ..extensions import db
-from cryptovote.protocols import stv_tally
+from shuffle_sum.protocols import stv_tally
 
 
 blueprint = Blueprint('election', __name__)

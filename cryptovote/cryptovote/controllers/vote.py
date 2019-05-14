@@ -4,7 +4,7 @@ from random import shuffle
 from ..helpers import election_exists
 from ..models import Voter, Candidate, Authority
 from ..extensions import db
-from cryptovote.ballots import CandidateOrderBallot
+from shuffle_sum.ballots import CandidateOrderBallot
 
 blueprint = Blueprint('vote', __name__)
 

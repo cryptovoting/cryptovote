@@ -12,4 +12,5 @@ webauthn
 uuid
 sendgrid
 flask-bcrypt
+damgard-jurik
 shuffle-sum

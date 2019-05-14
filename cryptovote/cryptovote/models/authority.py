@@ -1,7 +1,7 @@
 from ..extensions import db
 from flask_login import UserMixin as FlaskLoginUser
 from uuid import uuid4
-from cryptovote.damgard_jurik import keygen
+from damgard_jurik import keygen
 
 
 class Authority(db.Model, FlaskLoginUser):
