@@ -11,7 +11,10 @@
         <div class="heading">
             <h1>Ballot</h1>
         </div>
-        <form action="{{ url_for('vote.vote', election=election.name) }}" method="post">
+        <form id="ballot-form" action="{{ url_for('vote.vote', election=election.name) }}" method="post" onsubmit="return submitForm()">
+            <input type="hidden" name="key_s" value="{{ public_key.s }}">
+            <input type="hidden" name="key_n" value="{{ public_key.n }}">
+
             <div class="form-group">
 
               <ul id="sortable_nav" class="sortable ui-sortable" >
@@ -26,7 +29,8 @@
               </ul>
 
             </div>
-            <input type="hidden" id="ballot" name="ballot"></input>
+            <input type="hidden" id="ballot" name="ballot"/>
+            <input type="hidden" name="encrypted" value="1"/>
             <div class="form-group" style="margin-top: 50px;">
               <button type="submit" class="btn btn-primary btn-block btn-lg" style="background-color: #0084da;">Submit Ballot</button>
             </div>
@@ -37,6 +41,7 @@
 
 {% block scripts %}
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="/static/js/encrypt-ballot.js"></script>
 <script type="text/javascript">
   $("#sortable_nav").sortable({
       placeholder: "ui-state-highlight",
