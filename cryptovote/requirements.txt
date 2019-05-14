@@ -1,0 +1,15 @@
+#
+# ############# pip3 Requirements File #############
+#                   cryptovote
+# Example usage: pip3 install -r requirements.txt
+#
+flask
+flask_sqlalchemy
+python-dotenv
+flask_migrate
+flask-login
+webauthn
+uuid
+sendgrid
+flask-bcrypt
+shuffle-sum

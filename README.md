@@ -20,7 +20,7 @@ All requirements for this package should be added to `setup.py`.
 To run an election via the web interface, run the following commands:
 
 ```bash
-cd cryptovote_web
+cd cryptovote
 pip install -r requirements.txt
 python -m flask run
 ```
