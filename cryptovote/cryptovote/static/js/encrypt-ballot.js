@@ -31,6 +31,7 @@ class PublicKey {
             power *= 2;
         let len = Math.ceil(i / 8);
 
+        // cryptographically secure random
         let rands = crypto.getRandomValues(new Uint8Array(len));
 
         const byte = 2n ** 8n;
@@ -64,26 +65,6 @@ class PublicKey {
     }
 }
 
-function shuffle(array) {
-    let currentIndex = array.length, temporaryValue, randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-
-        // Pick a remaining element...
-
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        // And swap it with the current element.
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
-
-    return array;
-}
-
 function submitForm() {
     try {
         const $form = $("form#ballot-form");
@@ -101,6 +82,7 @@ function submitForm() {
                 candidate: candidates[i]
             });
         }
+        preferences.sort((x, y) => x.candidate > y.candidate ? 1 : (x.candidate < y.candidate ? -1 : 0));
         ballot.val(JSON.stringify(preferences));
         return true;
     } catch (e) {
