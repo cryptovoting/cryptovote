@@ -71,8 +71,8 @@ function submitForm() {
 
         let ballot = $form.find("input[name=ballot]");
         let candidates = ballot.val().split(",");
-        const n = $form.find("input[name=key_n").val().trim();
-        const s = $form.find("input[name=key_s").val().trim();
+        const n = $form.find("input[name=key_n]").val().trim();
+        const s = $form.find("input[name=key_s]").val().trim();
 
         let publicKey = new PublicKey(BigInt(n), BigInt(s));
         let preferences = [];
