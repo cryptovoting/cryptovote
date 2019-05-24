@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, redirect, url_for, session, request, flash
+from damgard_jurik import EncryptedNumber
+from flask import Blueprint, render_template, redirect, url_for, session, request, flash, json
 from random import shuffle
 from ..helpers import election_exists
 from ..models import Voter, Candidate, Authority
@@ -57,37 +58,47 @@ def vote(election):
         return redirect(url_for('election.election_home', election=election.name))
     candidates = election.candidates
     shuffle(candidates)
+
+    authority = Authority.query.filter_by(election=election).first()
+    if not authority:
+        flash("Election is missing authorities.")
+        return redirect(url_for('election.election_home', election=election.name))
+    public_key = authority.public_key
+    if not public_key:
+        flash("Authority missing public key.")
+        return redirect(url_for('election.election_home', election=election.name))
+
     if request.method == 'GET':
-        return render_template('vote/vote.html', election=election, candidates=candidates)
+        return render_template('vote/vote.html', election=election, candidates=candidates, public_key=public_key)
     else:
         ballot = request.form.get("ballot")
         if not ballot:
             flash("No ballot submitted.")
             return render_template('vote/vote.html', election=election, candidates=candidates)
-        authority = Authority.query.filter_by(election=election).first()
-        if not authority:
-            flash("Election is missing authorities.")
-            return redirect(url_for('election.election_home', election=election.name))
-        public_key = authority.public_key
-        if not public_key:
-            flash("Authority missing public key.")
-            return redirect(url_for('election.election_home', election=election.name))
-        candidates = []
-        for candidate in ballot.split(','):
+        ballot_dec = json.loads(ballot)
+
+        # here, candidates and preferences are strings
+        cand_prefs_raw = [(cand_pref['candidate'], cand_pref['preference']) for cand_pref in ballot_dec]
+
+        # here they are both ints
+        cand_prefs = []
+        for candidate, preference in cand_prefs_raw:
             c = Candidate.query.filter_by(election=election, name=candidate).first()
             if not c:
                 flash("Invalid ballot.")
                 return render_template('vote/vote.html', election=election, candidates=candidates)
-            candidates.append(c.id)
-        if len(election.candidates) != len(candidates):
+
+            pref = EncryptedNumber(int(preference), public_key)
+            cand_prefs.append((c.id, pref))
+
+        if len(election.candidates) != len(cand_prefs):
             flash("Invalid number of votes on ballot.")
             return render_template('vote/vote.html', election=election, candidates=candidates)
-        preferences = list(range(1, len(candidates)+1))
-        candidate_to_preference = {candidate: preference for candidate, preference in zip(candidates, preferences)}
-        candidates.sort()
-        preferences = [candidate_to_preference[candidate] for candidate in candidates]
+
         weight = public_key.encrypt(1)
-        enc_preferences = list(map(lambda p : public_key.encrypt(p), preferences))
+        candidates = [cand_pref[0] for cand_pref in cand_prefs]
+        enc_preferences = [cand_pref[1] for cand_pref in cand_prefs]
+
         voter.ballot = CandidateOrderBallot(candidates, enc_preferences, weight)
         election.bulletin += f"{voter.id}: "
         for preference in enc_preferences:

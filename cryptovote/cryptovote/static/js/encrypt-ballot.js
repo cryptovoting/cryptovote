@@ -3,15 +3,12 @@ class PublicKey {
      *
      * @param n BigInt
      * @param s BigInt
-     * @param m BigInt
      */
-    constructor(n, s, m) {
+    constructor(n, s) {
         this.s = s;
         this.n = n;
-        this.m = m;
         this.n_s = this.n ** this.s;  // n^s
         this.n_s_1 = this.n_s * this.n;  // n^(s+1)
-        this.n_s_m = this.n_s * this.m;  // n^s * m
     }
 
     /**
@@ -21,14 +18,14 @@ class PublicKey {
      */
     encrypt(m) {
         let r = PublicKey.get_random_below(this.n - 1n) + 1n;
-        return PublicKey.pow_mod(this.n + 1, m, this.n_s_1) * PublicKey.pow_mod(r, this.n_s, this.n_s_1) % this.n_s_1
+        return PublicKey.pow_mod(this.n + 1n, m, this.n_s_1) * PublicKey.pow_mod(r, this.n_s, this.n_s_1) % this.n_s_1
     }
 
     static get_random_below(n) {
-        let power = 1;
+        let power = 1n;
         let i = 0;
         for (; power < n; i++)
-            power *= 2;
+            power *= 2n;
         let len = Math.ceil(i / 8);
 
         // cryptographically secure random
@@ -41,7 +38,7 @@ class PublicKey {
             build += BigInt(rands[i]) * f;
             f *= byte;
         }
-        return build % n;
+        return build % BigInt(n);
     }
 
     /**
